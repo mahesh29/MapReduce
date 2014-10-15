@@ -1,0 +1,79 @@
+README
+--------
+
+The previous Word count program, is modified, to experiment with MapReduce. These modifications that we do, giving us 4 implementations of WordCount Mapreduce implementation. We would run each variation and then analyze each situation. 
+
+
+Each of the WordCount variations was run on AWS-EMR-S3, with 1 Master 5 Worker configuration, all small machines.
+ 
+
+The MODIFICATION to the Word Count program is to “Only consider REAL WORDS”, and then count them
+
+REAL WORDS :: Words starting with ‘m’ , ’n’ , ‘o’ , ‘p’ , ‘q’ (regardless of the Casing)
+
+Eg: 
+
+Mapreduce, mapreduce1, pMapreduce3, oMapred34oce, p#$#reduce, …etc are Real words
+aMapreduce, bmapreduce1, cpMapreduce3, doMapred34oce, ep#$#reduce, …etc are NOT-Real words(Thus should be ignored by the program.)
+
+
+
+The VARIATIONS of the WordCount program are implemented in each Folder here.
+
+Each Sub-Folder ( in 'Source_Code' & 'Output_Files' ) is given a particular name, hinting at the variation being implemented here.
+The following list of Folder-Description mapping should do the explaining better.
+
+
+NoCombiner		:	No Combiner used 
+SiCombiner		:	A Combiner IS used 
+PerMapTally		:	Implementing In-Mapper Combiner for each MAP CALL
+PerTaskTally	:	Implementing In-Mapper Combiner for each MAP TASK
+
+
+
+I have included the Report of my experiment with variation of the WordCount MapReduce Implementation on the AWS, which has the analysis on the variations, and verious insights about MapReduce in general.
+
+
+
+
+
+
+
+
+Output_Files
+------------
+
+Each folder contains the output for each variation of the WordCount problem.
+
+
+NoCombiner		:	No Combiner used 
+SiCombiner		:	A Combiner IS used 
+PerMapTally		:	Implementing In-Mapper Combiner for each MAP CALL
+PerTaskTally	:	Implementing In-Mapper Combiner for each MAP TASK
+
+
+
+
+
+
+
+
+
+
+
+
+
+Source_Code
+------------
+
+Each folder contains an implementation of each variation of the WordCount problem.
+
+
+The following list of Folder-Description mapping should do the explaining better.
+
+
+NoCombiner		:	No Combiner used 
+SiCombiner		:	A Combiner IS used 
+PerMapTally		:	Implementing In-Mapper Combiner for each MAP CALL
+PerTaskTally	:	Implementing In-Mapper Combiner for each MAP TASK
+

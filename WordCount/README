@@ -1,0 +1,7 @@
+Basic running of a WordCount program - MapReduce implementation.
+We analyze this case and learn more about how MapReduce works.
+
+First we run this on our local Hadoop distribution (1.2.1), and then we complement this with running it on the AWS-EMR-S3.
+We use 1 Master 2 Worker configuration (With medium machines)
+
+I have included a Report, where I have mentioned all my findings in brief.
