@@ -73,4 +73,4 @@
  average_delay = FOREACH gResult GENERATE AVG(result.sumOfDelays);
  
  --dump average_delay;
- STORE average_delay INTO 's3://hw3flightchallenge/outputs/2s3://hw3flightchallenge/data/data.csv//' USING PigStorage();
+ STORE average_delay INTO 's3://hw3flightchallenge/outputs/2' USING PigStorage();
