@@ -21,54 +21,53 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import au.com.bytecode.opencsv.CSVParser;
+
 public class PopularityByTag {
 	public static enum GlobalCounters {
 		TOTAL_NUM_OF_TAGS // Stores the total Number of Tags
 	}
-	private static final long TAGS = 23585810; 
+	private static final long TAGS = 23585810; //10; 
+	private static final int TAGS_INDEX = 1;
 
 	public static class PopularityByTagMapper extends
 			Mapper<LongWritable, Text, Text, IntWritable> {
 		private Text tag = null;
 		private IntWritable count = null;
-		private int total = 0;		
-
+		private int total = 0;	
+		private static final String HASH_SEPERATOR = "=";
 		private HashMap<String, Integer> tagCountMap;
-
-		// Pattern for parsing the Tags-String from the Input Line
-		Pattern tagPattern = Pattern.compile("<(.*)>");
+		// initialize CSVParser as comma separated values
+		private CSVParser csvParser = null; 
+		
 
 		public void setup(Context context) throws IOException,
 				InterruptedException {
 			tagCountMap = new HashMap<String, Integer>();
+			this.csvParser = new CSVParser(',', '"');
 		}
 
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 			
-			String line = value.toString();			
-			Matcher mat = tagPattern.matcher(line);
-			String tagString = "";
-
-			while (mat.find()) {
-				tagString = mat.group(1);
+			String line = value.toString();	
+			String[] parsedData = this.csvParser.parseLine(line.toString());;
+			String[] hashTags = parsedData[TAGS_INDEX].replaceAll("><", HASH_SEPERATOR).replaceAll("<", "").replaceAll(">", "").split(HASH_SEPERATOR);
+			
+			if(hashTags.length <= 0){
+				return;
 			}
-
-			String[] tagStrArr = null;
-			// Check if the Tags-String is present in the input line (not "")
-			if (! tagString.isEmpty()) {
-				tagStrArr = tagString.split("><");
-
-				// Put in Array elements in Tags-Map
-				for (String aTag : tagStrArr)
-				{
-					if (! tagCountMap.containsKey(aTag)) {
-						tagCountMap.put(aTag, 1);
-						total++;
-					} else {
-						tagCountMap.put(aTag, tagCountMap.get(aTag) + 1);
-						total++;
-					}
+			
+			for(String tag : hashTags){
+				if(tag.isEmpty()){
+					continue;
+				}				
+				if (! tagCountMap.containsKey(tag)) {
+					tagCountMap.put(tag, 1);
+					total++;
+				} else {
+					tagCountMap.put(tag, tagCountMap.get(tag) + 1);
+					total++;
 				}
 			}
 		}
@@ -103,7 +102,7 @@ public class PopularityByTag {
 		@Override
 		public void setup(Context context) throws IOException,
 				InterruptedException {			
-			System.out.println(context.getCounter(GlobalCounters.TOTAL_NUM_OF_TAGS).getValue());
+			//System.out.println(context.getCounter(GlobalCounters.TOTAL_NUM_OF_TAGS).getValue());
 		}
 
 		public void reduce(Text key, Iterable<IntWritable> values,
@@ -114,7 +113,7 @@ public class PopularityByTag {
 				totalPerTag += countVal.get();
 			}
 			
-			double popularityIndex = totalPerTag / (double)(TAGS) * 100;
+			double popularityIndex = (totalPerTag / (double)(TAGS)) * 100000;
 			
 			context.write(key, new DoubleWritable(roundTwoDecimals(popularityIndex)));
 		}
@@ -127,9 +126,10 @@ public class PopularityByTag {
 
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-
-		Job job = new Job(conf, "TagsPopularity");
-
+		conf.set("mapred.textoutputformat.separator", ",");
+		
+		Job job = new Job(conf, "TagsPopularity");		
+		
 		job.setJarByClass(TagsPopularityFromPosts.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(DoubleWritable.class);
